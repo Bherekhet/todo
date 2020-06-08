@@ -1,53 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../constants.dart' as Globals;
+import '../providers/todo_list.dart';
 
 class TodoItem extends StatelessWidget {
-  final int id;
+  final String id;
   final String task;
   final bool isTaskDone;
 
   TodoItem({this.id, this.task, this.isTaskDone});
 
+  bool _onSwipeTodelete() {}
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Container(
-          height: 60,
-          // color: Colors.red,
-          child: ListTile(
-            leading:
-                Icon(isTaskDone ? Icons.check_box : Icons.check_box_outline_blank),
-            title: Text(
-              task,
-              style: isTaskDone ? Globals.tCompletedTodoTask : Globals.tTodoTask,
+    final todo = Provider.of<TodoList>(context);
+    return Dismissible(
+      key: ValueKey(id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Theme.of(context).errorColor,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 20),
+        margin: EdgeInsets.all(4),
+        child: IconButton(
+          icon: Icon(Icons.delete, color: Colors.white),
+          onPressed: () {},
+        ),
+      ),
+      onDismissed: (direction) {
+        if (id != null) {
+          todo.deleteTask(id);
+        }
+      },
+      child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    isTaskDone
+                        ? Icons.check_box
+                        : Icons.check_box_outline_blank,
+                    size: 35,
+                    color: isTaskDone
+                        ? Theme.of(context).accentColor
+                        : Theme.of(context).primaryColor,
+                  ),
+                  onPressed: () {
+                    todo.toggleCompleted(id);
+                  },
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  task,
+                  style: isTaskDone
+                      ? Globals.tCompletedTodoTask
+                      : Globals.tTodoTask,
+                ),
+              ],
             ),
-            subtitle: Text(
-                '${DateTime.now().month}/ ${DateTime.now().day}/ ${DateTime.now().year} '),
-            trailing: Icon(Icons.delete),
-            contentPadding: EdgeInsets.symmetric(horizontal: 15),
           ),
         ),
-        // Divider(indent: 40, endIndent: 40, thickness: 2,)
-      ],
+      ),
     );
-    // Row(
-    //   children: <Widget>[
-    //     IconButton(
-    //       color: isTaskDone ? Colors.grey : null,
-    //       icon: Icon(
-    //           isTaskDone ? Icons.check_box : Icons.check_box_outline_blank),
-    //       onPressed: () {},
-    //     ),
-    //     SizedBox(
-    //       width: 10,
-    //     ),
-    //     Container(
-
-    //       child: Text(task, style: isTaskDone ? Globals.tCompletedTodoTask : Globals.tTodoTask,),
-    //     )
-    //   ],
-    // );
   }
 }

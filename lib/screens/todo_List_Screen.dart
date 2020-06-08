@@ -1,112 +1,97 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../widgets/todo_catagory.dart';
+import '../widgets/add_todo_task.dart';
+import '../providers/todo_list.dart';
 import '../widgets/todo_Item.dart';
 import '../constants.dart' as Globals;
-
-List _tasks = [
-  {
-    'id': 0,
-    'catagory': 'Activity',
-    'tasks': [
-      'play soccer',
-      'go for a swim',
-    ],
-    'date': DateTime.now(),
-  },
-  {
-    'id': 1,
-    'catagory': 'Study',
-    'tasks': [
-      'Algorithms',
-      'todo app',
-    ],
-    'date': DateTime.now(),
-  },
-];
 
 class TodoListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final tasks = Provider.of<TodoList>(context).tasks;
+    print('error caused $tasks');
     return Scaffold(
       backgroundColor: CupertinoColors.white,
-      appBar: AppBar(
-        title: Text('Tasks'),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: ScrollPhysics(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Container(
-              //   padding: EdgeInsets.only(top: 10),
-              //   alignment: Alignment.topCenter,
-              //   child: Text('Your todo list', style: Globals.tTodoListTitle,),
-              // ),
-              TodoCatagory(
-                  id: _tasks[0]['id'], catagory: _tasks[0]['catagory']),
-              
-              TodoItem(
-                id: _tasks[0]['id'],
-                task: _tasks[0]['tasks'][0],
-                isTaskDone: false,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: Text(
+                      'June 6th, 2020',
+                      style: Globals.tScreenTitleDate,
+                    ),
+                  ),
+                  Container(
+                    height: 40,
+                    color: Theme.of(context).primaryColor,
+                    width: 2,
+                    margin: EdgeInsets.all(10),
+                  ),
+                  GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        'Monday',
+                        style: Globals.tScreenTitleDay,
+                      ),
+                    ),
+                    onTap: () {
+                      print('day selected');
+                    },
+                  ),
+                ],
               ),
-              TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
+              Divider(
+                endIndent: 50,
+                indent: 50,
+                color: Theme.of(context).accentColor,
               ),
-              TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
+              SizedBox(
+                height: 20,
               ),
-
-              TodoCatagory(
-                  id: _tasks[1]['id'], catagory: _tasks[1]['catagory']),
-              
-              TodoItem(
-                id: _tasks[0]['id'],
-                task: _tasks[0]['tasks'][0],
-                isTaskDone: false,
-              ),
-              TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),
-              TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),
-              TodoItem(
-                id: _tasks[1]['id'],
-                task: _tasks[1]['tasks'][1],
-                isTaskDone: true,
-              ),
+              Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Text(
+                    'Your Todos',
+                    style: Globals.tTodoCatagory,
+                  )),
+              tasks.isNotEmpty ? ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: tasks.length,
+                itemBuilder: (_, i) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50),
+                  child: TodoItem(
+                    id: tasks.keys.toList()[i],
+                    task: tasks.values.toList()[i].title,
+                    isTaskDone: tasks.values.toList()[i].isComplete,
+                  ),
+                ),
+              ): Center(child: Text('Your todo list is empty')),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {},
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          backgroundColor: Theme.of(context).primaryColor,
+          child: Icon(
+            Icons.add,
+          ),
+          onPressed: () {
+            showDialog(context: context, builder: (BuildContext ctx) {
+              return AddTodoTask();
+            });
+          }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

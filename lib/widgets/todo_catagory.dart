@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../constants.dart' as Globals;
 
 class TodoCatagory extends StatelessWidget {
-  final int id;
+  final String id;
   final String catagory;
 
   TodoCatagory({this.id, this.catagory});
