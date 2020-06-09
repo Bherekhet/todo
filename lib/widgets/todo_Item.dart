@@ -5,13 +5,11 @@ import '../constants.dart' as Globals;
 import '../providers/todo_list.dart';
 
 class TodoItem extends StatelessWidget {
-  final String id;
+  final int id;
   final String task;
-  final bool isTaskDone;
+  final int isTaskDone;
 
   TodoItem({this.id, this.task, this.isTaskDone});
-
-  bool _onSwipeTodelete() {}
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +42,11 @@ class TodoItem extends StatelessWidget {
               children: <Widget>[
                 IconButton(
                   icon: Icon(
-                    isTaskDone
+                    isTaskDone == 1
                         ? Icons.check_box
                         : Icons.check_box_outline_blank,
                     size: 35,
-                    color: isTaskDone
+                    color: isTaskDone == 1
                         ? Theme.of(context).accentColor
                         : Theme.of(context).primaryColor,
                   ),
@@ -59,11 +57,13 @@ class TodoItem extends StatelessWidget {
                 SizedBox(
                   width: 10,
                 ),
-                Text(
-                  task,
-                  style: isTaskDone
-                      ? Globals.tCompletedTodoTask
-                      : Globals.tTodoTask,
+                Flexible(
+                  child: Text(
+                    task,
+                    style: isTaskDone == 1
+                        ? Globals.tCompletedTodoTask
+                        : Globals.tTodoTask,
+                  ),
                 ),
               ],
             ),

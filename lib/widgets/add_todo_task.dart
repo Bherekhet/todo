@@ -24,7 +24,7 @@ class _AddTodoTaskState extends State<AddTodoTask> {
             child: Text('Add'),
             onPressed: () {
               if (_formKey.currentState.validate() && _selectedDate!= null) {
-                todo.addTodo(_controller.text, false, _selectedDate);
+                todo.addTodo(_controller.text, 0, _selectedDate);
                 Navigator.pop(context);
               } else {
                 print('date left empty');
@@ -70,6 +70,7 @@ class _AddTodoTaskState extends State<AddTodoTask> {
                       firstDate: DateTime(2001),
                       lastDate: DateTime(2222),
                     ).then((value) {
+                      
                       setState(() {
                         _selectedDate = value;
                       });

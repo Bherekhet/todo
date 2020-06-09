@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
           value: TodoList(),
         ),
         ChangeNotifierProvider.value(
-          value: Tasks(),
+          value: Task(),
         ),
       ],
       child: MaterialApp(
@@ -31,20 +31,5 @@ class MyApp extends StatelessWidget {
         home: TodoListScreen(),
       ),
     );
-
-    // MaterialApp(
-    // debugShowCheckedModeBanner: false,
-    // title: 'Todo List',
-    // theme: ThemeData(
-    //     primaryColor: Color(0xff32e0c4),
-    //     accentColor: Color(0xffe8ead3),
-    //     fontFamily: 'TenaliRamakrishna'),
-    //   home: MultiProvider(
-    //         providers: [
-    //           ChangeNotifierProvider.value(value: TodoList(),),
-    //           ChangeNotifierProvider.value(value: Tasks(),)
-    //         ],
-    //     child: TodoListScreen()),
-    // );
   }
 }

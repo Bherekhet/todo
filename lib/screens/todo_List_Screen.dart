@@ -1,17 +1,50 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 import '../widgets/add_todo_task.dart';
 import '../providers/todo_list.dart';
 import '../widgets/todo_Item.dart';
 import '../constants.dart' as Globals;
 
-class TodoListScreen extends StatelessWidget {
+class TodoListScreen extends StatefulWidget {
+  @override
+  _TodoListScreenState createState() => _TodoListScreenState();
+}
+
+class _TodoListScreenState extends State<TodoListScreen> {
+  bool _isnit = false;
+  final currentDate = DateTime.now();
+  bool perDate = false;
+  DateTime selectedDate;
+
+  @override
+  void initState() {
+    _isnit = true;
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isnit) {
+      if (this.mounted) {
+        Provider.of<TodoList>(context).getAllTodos();
+        setState(() {
+          _isnit = false;
+        });
+      }
+    }
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final tasks = Provider.of<TodoList>(context).tasks;
-    print('error caused $tasks');
+    final currentDay = DateFormat('EEEE').format(currentDate);
+    final formattedDate = DateFormat('MMMM d, yyyy').format(currentDate);
+    final todo = Provider.of<TodoList>(context);
+    final tasks = perDate ? todo.sortTaskPerDate(selectedDate) : todo.tasks;
+
     return Scaffold(
       backgroundColor: CupertinoColors.white,
       body: SafeArea(
@@ -26,7 +59,7 @@ class TodoListScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
                     child: Text(
-                      'June 6th, 2020',
+                      perDate ? DateFormat('MMMM d, yyyy').format(selectedDate) :formattedDate,
                       style: Globals.tScreenTitleDate,
                     ),
                   ),
@@ -39,13 +72,25 @@ class TodoListScreen extends StatelessWidget {
                   GestureDetector(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Monday',
-                        style: Globals.tScreenTitleDay,
+                      child: Container(
+                        child: Text(
+                          perDate ? DateFormat('EEEE').format(selectedDate):currentDay,
+                          style: Globals.tScreenTitleDay,
+                        ),
                       ),
                     ),
                     onTap: () {
-                      print('day selected');
+                      showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2001),
+                        lastDate: DateTime(2222),
+                      ).then((value) {
+                        setState(() {
+                          selectedDate = value;
+                          perDate = true;
+                        });
+                      });
                     },
                   ),
                 ],
@@ -58,25 +103,31 @@ class TodoListScreen extends StatelessWidget {
               SizedBox(
                 height: 20,
               ),
+              Center(
+                child: Text(
+                    'You have ${todo.countCompletedTasks(tasks)} tasks completed.'),
+              ),
               Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: Text(
                     'Your Todos',
                     style: Globals.tTodoCatagory,
                   )),
-              tasks.isNotEmpty ? ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: tasks.length,
-                itemBuilder: (_, i) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50),
-                  child: TodoItem(
-                    id: tasks.keys.toList()[i],
-                    task: tasks.values.toList()[i].title,
-                    isTaskDone: tasks.values.toList()[i].isComplete,
-                  ),
-                ),
-              ): Center(child: Text('Your todo list is empty')),
+              tasks.isNotEmpty
+                  ? ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: tasks.length,
+                      itemBuilder: (_, i) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: TodoItem(
+                          id: tasks.keys.toList()[i],
+                          task: tasks.values.toList()[i].title,
+                          isTaskDone: tasks.values.toList()[i].isComplete,
+                        ),
+                      ),
+                    )
+                  : Center(child: Text('Your todo list is empty')),
             ],
           ),
         ),
@@ -87,9 +138,11 @@ class TodoListScreen extends StatelessWidget {
             Icons.add,
           ),
           onPressed: () {
-            showDialog(context: context, builder: (BuildContext ctx) {
-              return AddTodoTask();
-            });
+            showDialog(
+                context: context,
+                builder: (BuildContext ctx) {
+                  return AddTodoTask();
+                });
           }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
