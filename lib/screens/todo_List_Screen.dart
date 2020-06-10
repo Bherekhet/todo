@@ -59,7 +59,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
                     child: Text(
-                      perDate ? DateFormat('MMMM d, yyyy').format(selectedDate) :formattedDate,
+                      (perDate) ? DateFormat('MMMM d, yyyy').format(selectedDate) :formattedDate,
                       style: Globals.tScreenTitleDate,
                     ),
                   ),
@@ -74,7 +74,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Container(
                         child: Text(
-                          perDate ? DateFormat('EEEE').format(selectedDate):currentDay,
+                         (perDate) ? DateFormat('EEEE').format(selectedDate):currentDay,
                           style: Globals.tScreenTitleDay,
                         ),
                       ),
@@ -86,10 +86,13 @@ class _TodoListScreenState extends State<TodoListScreen> {
                         firstDate: DateTime(2001),
                         lastDate: DateTime(2222),
                       ).then((value) {
-                        setState(() {
+                        if(value != null){
+                          setState(() {
                           selectedDate = value;
                           perDate = true;
                         });
+                        }
+                        
                       });
                     },
                   ),

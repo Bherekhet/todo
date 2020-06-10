@@ -4,18 +4,20 @@ import 'dart:io' show Directory;
 import 'package:path/path.dart' show join;
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
+  final newFormat = DateFormat("MM-dd-yy");
 
   static final _databaseName = "Todo_list_database.db";
   static final _databaseVersion = 1;
 
   static final table = 'todos';
 
-  static final column_id = 'id';
-  static final column_title = 'title';
-  static final column_isCompleted = 'isComplete';
-  static final column_date = 'date';
+  static final columnId = 'id';
+  static final columnTitle = 'title';
+  static final columnIsCompleted = 'isComplete';
+  static final columnDate = 'date';
 
   // make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -45,16 +47,16 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.execute('''
           CREATE TABLE $table (
-            $column_id TEXT PRIMARY KEY,
-            $column_title TEXT NOT NULL,
-            $column_isCompleted INTEGER NOT NULL,
-            $column_date TEXT NOT NULL
+            $columnId TEXT PRIMARY KEY,
+            $columnTitle TEXT NOT NULL,
+            $columnIsCompleted INTEGER NOT NULL,
+            $columnDate TEXT NOT NULL
           )
           ''');
 
     // // prepopulate a few rows (consider using a transaction)
-    // await db.rawInsert('INSERT INTO $table ($columnName, $columnAge) VALUES("Bob", 23)');
-    // await db.rawInsert('INSERT INTO $table ($columnName, $columnAge) VALUES("Mary", 32)');
-    // await db.rawInsert('INSERT INTO $table ($columnName, $columnAge) VALUES("Susan", 12)');
+    await db.rawInsert('INSERT INTO $table VALUES("0", "Example Task", 0, "${newFormat.format(DateTime.now())}")');
+    await db.rawInsert('INSERT INTO $table VALUES("1", "Swipe left to delete", 1, "${newFormat.format(DateTime.now())}")');
+    await db.rawInsert('INSERT INTO $table VALUES("2", "Select checkbox to complete task", 0, "${newFormat.format(DateTime.now())}")');
   }
 }

@@ -46,7 +46,6 @@ class TodoList with ChangeNotifier {
 
     //create an id based on the last id used, +1
     final int newId = _todos.keys.toList().last;
-    print(newId);
 
     Task newTask = Task(
         id: '${newId + 1}',
@@ -63,7 +62,6 @@ class TodoList with ChangeNotifier {
 
   void toggleCompleted(int id) async {
     Database db = await DatabaseHelper.instance.database;
-    print(_todos[id].toMap());
     _todos.update(id, (existingValue) {
       return Task(
           id: existingValue.id,
@@ -73,7 +71,7 @@ class TodoList with ChangeNotifier {
     });
     db.update(DatabaseHelper.table, _todos[id].toMap(),
         where: "id = ?",
-        whereArgs: [id]).whenComplete(() => print('completed'));
+        whereArgs: [id]);
     notifyListeners();
   }
 
