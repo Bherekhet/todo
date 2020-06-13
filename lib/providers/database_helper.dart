@@ -54,7 +54,7 @@ class DatabaseHelper {
           )
           ''');
 
-    // // prepopulate a few rows (consider using a transaction)
+    //prepopulate a few rows (consider using a transaction)
     await db.rawInsert('INSERT INTO $table VALUES("0", "Example Task", 0, "${newFormat.format(DateTime.now())}")');
     await db.rawInsert('INSERT INTO $table VALUES("1", "Swipe left to delete", 1, "${newFormat.format(DateTime.now())}")');
     await db.rawInsert('INSERT INTO $table VALUES("2", "Select checkbox to complete task", 0, "${newFormat.format(DateTime.now())}")');

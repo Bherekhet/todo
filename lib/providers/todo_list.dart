@@ -30,6 +30,7 @@ class Task with ChangeNotifier {
   }
 }
 
+// to record completed tasks i used integers 0 = false and 1 = true, because sqlite doesn't support boolean
 class TodoList with ChangeNotifier {
   Map<int, Task> _todos = {};
   var newFormat = DateFormat("MM-dd-yy");
@@ -38,28 +39,29 @@ class TodoList with ChangeNotifier {
     return {..._todos};
   }
 
+  // this adds new todo item to the list
   void addTodo(title, complete, date) async {
     String updatedDt = newFormat.format(date);
 
     //instantiate the database
     Database db = await DatabaseHelper.instance.database;
 
-    //create an id based on the last id used, +1
-    final int newId = _todos.keys.toList().last;
+    final int oldId = _todos.keys.toList().last;
 
     Task newTask = Task(
-        id: '${newId + 1}',
+        id: '${oldId + 1}',
         title: title,
         isComplete: complete,
         date: '$updatedDt');
 
     //insert into database
     await db.insert(DatabaseHelper.table, newTask.toMap());
-    _todos.putIfAbsent(newId + 1, () => newTask);
+    _todos.putIfAbsent(oldId + 1, () => newTask);
 
     notifyListeners();
   }
 
+  // to change completed tasks respectively
   void toggleCompleted(int id) async {
     Database db = await DatabaseHelper.instance.database;
     _todos.update(id, (existingValue) {
@@ -69,20 +71,22 @@ class TodoList with ChangeNotifier {
           isComplete: existingValue.isComplete == 0 ? 1 : 0,
           date: existingValue.date);
     });
+
     db.update(DatabaseHelper.table, _todos[id].toMap(),
         where: "id = ?",
         whereArgs: [id]);
     notifyListeners();
   }
 
+  // this deletes swiped task
   void deleteTask(int id) async {
-    print(_todos[id]);
     _todos.remove(id);
     Database db = await DatabaseHelper.instance.database;
     db.delete(DatabaseHelper.table, where: "id = ?", whereArgs: [id]);
     notifyListeners();
   }
 
+  // this fetches all todos from the database
   void getAllTodos() async {
     Database db = await DatabaseHelper.instance.database;
 
@@ -95,12 +99,10 @@ class TodoList with ChangeNotifier {
       _todos.putIfAbsent(int.parse(index), () => Task.fromJson(element));
     });
 
-    result.forEach((element) {
-      print('db rows : $element');
-    });
     notifyListeners();
   }
 
+  // this counts completed tasks
   int countCompletedTasks(Map<int, Task> tsk) {
     int count = 0;
     tsk.forEach((key, value) {
@@ -111,6 +113,7 @@ class TodoList with ChangeNotifier {
     return count;
   }
 
+  // this sorts tasks based on Date selected by user
   Map<int, Task> sortTaskPerDate(DateTime date) {
     //get the right format of date in string 'mm-dd-yyyy'
     String updatedDt = newFormat.format(date);
